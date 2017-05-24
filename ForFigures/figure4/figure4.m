@@ -1,23 +1,21 @@
-
 clear
 close all
 currentPath=fileparts(which(mfilename));
 %% choose colors
 colors = colormap('lines');
 colors  = [colors(1:7,:);0,0.4,0.2];
-colors2=colors;
-colors1=repmat([0.45 0.45 0.45],8,1);
-
-%% load the data with the fits
-load(fullfile(currentPath,'fitting_gRatio_allAges_VoxelWise_gender.mat'))
 
 %% plot gratio
-fgNum=1:8;
 valName='gr';
+fgNum=1:8;
+models={'linear'};
 fgNames={'Occipital',  'Temporal',  'Post-Parietal',   'Sup-Parietal',  'Motor',  'Sup-Frontal',  'Ant-Frontal',  'Orb-Frontal'};
-
-f = nc_PlotModelFits_gender(coefsM(:),coefsF(:),valName,fgNames,fgNum,colors1,colors2,RsM,RsF);
-
+fitPath=fullfile(currentPath,'fitting_gRatio_allAges_VoxelWise_weighted.mat');
+load(fitPath)
+for j=1:length(models)
+    coefstemp=coefs(:,j); Rstemp=Rs(:,j);
+    f = nc_PlotModelFitsJ_fig2(coefstemp,valName,fgNames,fgNum,colors,Rstemp);
+end
 %% add the segmentation 
 
 load(fullfile(currentPath, 'CCseg.mat'))
@@ -43,22 +41,5 @@ h=imshow(gVals);
 set(h,'AlphaData',gMask)
 p=get(g,'position');
 set(g,'Position',[p(1)-0.02,p(2)-0.07,p(3)+0.07,p(4)+0.07])
-
-
-%% create legend
-figure, hold on
-plot([1 2],[1 1],'LineWidth',20,'Color',[0.45 0.45 0.45])
-xSegs=linspace(1,2,9);
-for ii=1:8
-    plot([xSegs(ii), xSegs(ii)+(xSegs(2)-xSegs(1))],[0.8 0.8],'LineWidth',20,'Color',colors2(ii,:))
-end
-% because of the line width, the segments over lap. remove the extra bit by adding a white section
-plot([xSegs(ii+1), xSegs(ii+1)+(xSegs(2)-xSegs(1))],[0.8 0.8],'LineWidth',20,'Color',[1 1 1])
-plot([xSegs(ii+1), xSegs(ii+1)+(xSegs(2)-xSegs(1))],[1 1],'LineWidth',20,'Color',[1 1 1])
-axis([0 4 0 2])
-text(1.95,1,'Males','fontSize',16,'fontName','times')
-text(1.95,0.8,'Females','fontSize',16,'fontName','times')
-
-
 
  

@@ -1,9 +1,9 @@
-close all, clear
-figure,
+ clear,  close all,
+figure(1),
 currentPath=fileparts(which(mfilename));
 %% choose colors
 colors = colormap('lines');
-%%  1: plot West et al.,'s data
+%%  1.1: plot West et al.'s data
 
 % load data:
 load(fullfile(currentPath,'figure1_West.mat'))
@@ -30,20 +30,27 @@ for ii=1:length(gr)
 end
 
 % add the identity line
-plot([0 0.35], [0 0.35],'--','color',[0.6 0.6 0.6])
+h(5)=identityLine(gca);
 
-r=corrcoef(MFhist.mean,TV.mean);r=r(2);
+% add a regression line
+x0=0:0.05:0.35;
+p=polyfit(MFhist.mean(:),TV.mean(:),1);
+y0=p(1)*x0+p(2);
+h(6)=plot(x0,y0,'-k');
+
+% calculate the coefficient of determination
+r=calccod(MFhist.mean,TV.mean);  
+
+% add information and design
 set(gca,'FontWeight','normal','fontSize',14)
-title(['r = ',num2str(round(r,2))], 'FontSize',18,'FontWeight','normal')
-xlabel('MVF_h_i_s_t','FontSize',18),
-ylabel('MTV_e_x_-_v_i_v_o','FontSize',18)
-set(gca,'xTick',[0:0.05:0.3]),
-set(gca,'yTick',[0:0.05:0.3]),
+title(['R^2 = ',num2str(round(r,2))], 'FontSize',18,'FontWeight','normal')
+xlabel('MVF_h_i_s_t','FontSize',18),  ylabel('MTV_e_x_-_v_i_v_o','FontSize',18)
+set(gca,'xTick',[0:0.05:0.3],'yTick',[0:0.05:0.3]),
 axis equal, axis([0 0.35 0 0.35])
 grid on, box on
 set(gca,'xTickLabel',{'0',' ','0.1',' ','0.2',' ','0.3'},'yTickLabel',{'0',' ','0.1',' ','0.2',' ','0.3'})
-legend(h,gr,'location','northwest', 'EdgeColor','k', 'location','southeast', 'FontSize',16)
 set(gca,'FontWeight','normal')
+legend(h,{gr{:},'identity line','linear fit'},'location','northwest', 'EdgeColor','k', 'location','northwest', 'FontSize',13)
 
 %%  2: plot the reproducibility of 4  subjects
 
@@ -63,8 +70,8 @@ l=length(gSub.mean);k=0;
 for ii=1:2:l
     k=k+1;
     %   plot the error bars
-    errorbar(gSub.mean(ii+1,:),gSub.mean(ii,:),gSub.std(ii+1,:),'.','color',[0.68 ,.68 ,.68]);
-    temp = herrorbar(gSub.mean(ii+1,:),gSub.mean(ii,:),gSub.std(ii,:),'.');
+    errorbar(gSub.mean(ii,:),gSub.mean(ii+1,:),gSub.std(ii,:),'.','color',[0.68 ,.68 ,.68]);
+    temp = herrorbar(gSub.mean(ii,:),gSub.mean(ii+1,:),gSub.std(ii+1,:),'.');
     for j = 1:length(temp)
         set(temp(j),'color',[0.68 ,.68 ,.68]);
     end
@@ -74,25 +81,33 @@ end
 k=0;
 for ii=1:2:l
     k=k+1;
-    h(k)= scatter(gSub.mean(ii+1,:),gSub.mean(ii,:),80,cl(k,:),'filled');
+    h(k)= scatter(gSub.mean(ii,:),gSub.mean(ii+1,:),80,cl(k,:),'filled');
 end
 
 % add the identity line
-plot([min(gSub.mean(:))-0.2,max(gSub.mean(:))+0.2], [min(gSub.mean(:))-0.2,max(gSub.mean(:))+0.2], '--','Color',[0.6 0.6 0.6])
+h(5)=identityLine(gca);
+
+
+% calculate the coefficient if determination
 x=gSub.mean([1:2:l],:); y=gSub.mean([2:2:l],:);
+r=calccod(x(:),y(:));
 
-r=corrcoef(x(:),y(:));r=r(2);
+% add a linear regression
+x0=0.5:0.1:0.8;
+p=polyfit(x(:),y(:),1);
+y0=p(1)*x0+p(2);
+h(6)=plot(x0,y0,'-k');
 
+% add information and design
 set(gca,'FontWeight','normal','fontSize',14)
-title(['r=',num2str(round(r,2))], 'FontSize',18,'FontWeight','normal'),
-legend(h,{'subject 1','subject 2','subject 3','subject 4'}, 'EdgeColor','k', 'location','southeast', 'FontSize',16)
-xlabel('g-ratio: scan 1','FontSize',18),
-ylabel('g-ratio: scan 2','FontSize',18)
+title(['R^2=',num2str(round(r,2))], 'FontSize',18,'FontWeight','normal'),
+xlabel('GR*: scan 1','FontSize',18), ylabel('GR*: scan 2','FontSize',18)
 axis equal, axis([0.5 0.8 0.5 0.8])
-set(gca,'xTick',[0.5:0.05:0.8]),
-set(gca,'yTick',[0.5:0.05:0.8]),
+set(gca,'xTick',[0.5:0.05:0.8],'yTick',[0.5:0.05:0.8]),
 set(gca,'xTickLabel',{'0.5',' ','0.6',' ','0.7',' ','0.8'},'yTickLabel',{'0.5',' ','0.6',' ','0.7',' ','0.8'})
 box on, grid on
+legend(h,{'subject 1','subject 2','subject 3','subject 4','identitity line','linear fit'}, 'EdgeColor','k', 'location','northwest', 'FontSize',13)
+
 
 %% individual correlation coefficient for the different subjects
 for ii=1:4
@@ -101,6 +116,5 @@ for ii=1:4
 end
 %  0.9522    0.9681    0.9806    0.9868
 meanR=mean(rs);
-
 
 
