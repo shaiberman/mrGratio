@@ -10,7 +10,7 @@ valName='gr';
 fgNum=1:8;
 models={'linear'};
 fgNames={'Occipital',  'Temporal',  'Post-Parietal',   'Sup-Parietal',  'Motor',  'Sup-Frontal',  'Ant-Frontal',  'Orb-Frontal'};
-fitPath=fullfile(currentPath,'fitting_gRatio_allAges_VoxelWise_weighted.mat');
+fitPath=fullfile(currentPath,'fitting_gRatio_allAges_VoxelWise_age.mat');
 load(fitPath)
 for j=1:length(models)
     coefstemp=coefs(:,j); Rstemp=Rs(:,j);

@@ -4,7 +4,7 @@ close all,
 currentPath=fileparts(which(mfilename));
 
 %% 2a.plot the histogram  of all voxels - in all subjects
-load(fullfile(currentPath,'figure2a_histData.mat'))
+load(fullfile(currentPath,'figure3a_histData.mat'))
 data = gTotal; 
 
 exgMin=prctile(data,1);
@@ -21,12 +21,12 @@ xlabel('g ratio'), ylabel('frequency')
 %% 2b. sub-region wise g-ratio
 
 % load cleaned segmentation
-maskPath=fullfile(currentPath,'fiberGroups_fig2/CCseg_highRes_sub2.nii.gz');
+maskPath=fullfile(currentPath,'fiberGroups_fig3/CCseg_highRes_sub2.nii.gz');
 CCseg=readFileNifti(maskPath);
 CC=rot90(squeeze(permute(CCseg.data,[2,3,1])));
 
 % load the weights, a T1 map and  brainmask
-R1=readFileNifti(fullfile(currentPath,'fiberGroups_fig2/R1_map_2DTI_ForFig.nii.gz'));
+R1=readFileNifti(fullfile(currentPath,'fiberGroups_fig3/R1_map_2DTI_ForFig.nii.gz'));
 % create a slice of T1 midSagittal map
 slice=100;
 R1=rot90(squeeze(permute(R1.data,[2,3,1])));
@@ -34,7 +34,7 @@ R1Slice=squeeze(R1(:,:,slice));
 CCslice=squeeze(CC(:,:,slice));
 
 % make the CC segmentation, color coded according to mean g value colors.
-load(fullfile(currentPath,'figure2_SubData.mat'))
+load(fullfile(currentPath,'figure3_SubData.mat'))
 meanG=nanmean(gSub.mean);
 
 gColors={[1 1 0.4353],[1 0.9569, 0],[1 1 0.2471],[1 0.7059 0] ,[1 0 0],...
